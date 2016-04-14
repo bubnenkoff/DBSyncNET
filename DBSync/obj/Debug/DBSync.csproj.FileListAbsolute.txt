@@ -1,0 +1,8 @@
+c:\users\bubenkov_di\documents\visual studio 2013\Projects\DBSync\DBSync\bin\Debug\DBSync.exe.config
+c:\users\bubenkov_di\documents\visual studio 2013\Projects\DBSync\DBSync\bin\Debug\DBSync.exe
+c:\users\bubenkov_di\documents\visual studio 2013\Projects\DBSync\DBSync\bin\Debug\DBSync.pdb
+c:\users\bubenkov_di\documents\visual studio 2013\Projects\DBSync\DBSync\bin\Debug\FirebirdSql.Data.FirebirdClient.dll
+c:\users\bubenkov_di\documents\visual studio 2013\Projects\DBSync\DBSync\bin\Debug\FirebirdSql.Data.FirebirdClient.pdb
+c:\users\bubenkov_di\documents\visual studio 2013\Projects\DBSync\DBSync\obj\Debug\DBSync.exe
+c:\users\bubenkov_di\documents\visual studio 2013\Projects\DBSync\DBSync\obj\Debug\DBSync.pdb
+c:\users\bubenkov_di\documents\visual studio 2013\Projects\DBSync\DBSync\obj\Debug\DBSync.csprojResolveAssemblyReference.cache
