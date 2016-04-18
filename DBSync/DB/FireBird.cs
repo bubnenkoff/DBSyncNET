@@ -5,26 +5,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
+using IniParser;
 
 namespace DBSync
 {
+
     class FireBird
     {
-        public static string connectionString =
-                 "User=SYSDBA;" +
-                 "Password=masterkey;" +
-                 "Database=D:\\Project\\2016\\DBSync\\TEST.FDB;" +
-                 "DataSource=localhost;" +
-                 "Port=3050;" +
-                 "Dialect=3;" +
-                 "Charset=NONE;" +
-                 "Role=;" +
-                 "Connection lifetime=15;" +
-                 "Pooling=true;" +
-                 "MinPoolSize=0;" +
-                 "MaxPoolSize=50;" +
-                 "Packet Size=8192;" +
-                 "ServerType=0";
+        Config config;
+       string connectionString;
+       public FireBird(Config config)
+        {
+            this.config = config;
+            connectionString =
+             "User="+ config.fbLogin + ";" +
+            "Password=" + config.fbPass + ";" +
+             "Database=" + config.fbPath + ";" +
+             "DataSource=localhost;" +
+             "Port=3050;" +
+             "Dialect=3;" +
+             "Charset=NONE;" +
+             "Role=;" +
+             "Connection lifetime=15;" +
+             "Pooling=true;" +
+             "MinPoolSize=0;" +
+             "MaxPoolSize=50;" +
+             "Packet Size=8192;" +
+             "ServerType=0";
+        }
+
 
         public static string testimg = "D:/Project/2016/DBSync/test.png";
         public static string outputimg = "D:/Project/2016/DBSync/output.png";
