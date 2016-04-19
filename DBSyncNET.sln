@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBSync", "DBSync\DBSync.csproj", "{F4035AF4-20FB-4F34-BD4C-8BF6261A6B04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBSyncNet", "DBSync\DBSyncNet.csproj", "{F4035AF4-20FB-4F34-BD4C-8BF6261A6B04}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{046549F4-C603-4200-A15B-8755A4F06EB3}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

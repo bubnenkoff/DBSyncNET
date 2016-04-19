@@ -19,6 +19,8 @@ namespace DBSync
             this.config = config;
         }
 
+       List<string> dbTablesList = new List<string>(); // LIST Of Tables in DB for processing
+
         struct UserData
         {
             public int id;
@@ -28,6 +30,58 @@ namespace DBSync
         };
 
 
+        List<string> getListDBTablesForProcessing() // List of TABLES in DB
+        {
+            
+            dbTablesList.AddRange(new List<string>() {"USERS"});
+            return dbTablesList;
+        }
+
+
+       public List<string> GetListDBsList() // selecting from pg_database and checking if DB from config is exists
+        {
+
+           NpgsqlConnection conn =
+                new NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=" + config.PGLogin + ";" +
+                                     "Password=" + config.PGPass + ";");
+            try
+            {
+                conn.Open();
+                string getlistofDBs = @"SELECT datname FROM pg_database; ";
+
+                NpgsqlCommand command = new NpgsqlCommand(getlistofDBs, conn);
+
+                try
+                {
+
+                    List<string> DBList = new List<string>();
+                    NpgsqlDataReader dr = command.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        DBList.Add(dr[0].ToString());
+                    }
+                    return DBList;
+                }
+
+                finally
+                {
+                    conn.Close();
+                }
+
+            }
+
+            catch (SocketException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                conn.Close();
+            }
+           return null;
+        }
+
+
         public void PGConnect()
         {
 
@@ -35,12 +89,27 @@ namespace DBSync
             List<UserData> uds = new List<UserData>();
             UserData ud;
 
-            NpgsqlConnection conn = new NpgsqlConnection("Server=127.0.0.1;Port=5433;User Id=" + config.PGLogin + ";" +
+            List<string> dblist = GetListDBsList();
+            if (dblist.Contains(config.PGdbName))
+            {
+                Console.WriteLine("Data Base exists: {0}", config.PGdbName);
+            }
+
+            else
+            {
+                Console.WriteLine("Data Base DO NOT exists: {0}", config.PGdbName);
+                return;
+            }
+
+            NpgsqlConnection conn = new NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=" + config.PGLogin + ";" +
                "Password=" + config.PGPass + ";Database=" + config.PGdbName + ";");
+
+            //select datname from pg_database;
 
             try
             {
                 conn.Open();
+                Console.WriteLine("PG Connected");
             }
 
             catch(SocketException e)
