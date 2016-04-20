@@ -174,21 +174,26 @@ namespace DBSync
 
             try
             {
-               
-                NpgsqlDataReader dr = command.ExecuteReader(); // here
+
+                NpgsqlDataReader dr = command.ExecuteReader(); // here exception
                 while (dr.Read())
                 {
-                   // UserData ud = new UserData();
+                    // UserData ud = new UserData();
                     ud.id = Int32.Parse(dr[0].ToString());
                     ud.guid = (dr[1].ToString());
                     ud.name = (dr[2].ToString());
-                    ud.userblob = (byte[])dr[3];
+                    ud.userblob = (byte[]) dr[3];
                     uds.Add(ud);
                     //File.WriteAllBytes("outputimg.jpg", ud.userblob);
                     //Console.ReadKey();
 
                 }
 
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
 
             finally
