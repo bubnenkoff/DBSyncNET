@@ -15,11 +15,13 @@ namespace DBSync
     {
         Config config;
        public Postgres(Config config)
-        {
-            this.config = config;
-        }
+       {
+           this.config = config;
+       }
 
-       List<string> dbTablesList = new List<string>(); // LIST Of Tables in DB for processing
+       List<string> requireTablesList = new List<string>(); // LIST Of Tables in DB for processing
+        List<string> existsInDBTables = new List<string>(); // this is getting from DB
+        List<string> notFoundedTables = new List<string>(); // Not founded Tables!
 
         struct UserData
         {
@@ -30,11 +32,11 @@ namespace DBSync
         };
 
 
-        List<string> getListDBTablesForProcessing() // List of TABLES in DB
+       public List<string> ListDBTablesForProcessing() // List of TABLES in DB
         {
             
-            dbTablesList.AddRange(new List<string>() {"USERS"});
-            return dbTablesList;
+            requireTablesList.AddRange(new List<string>() {"USERS"});
+            return requireTablesList;
         }
 
 
@@ -78,6 +80,7 @@ namespace DBSync
             {
                 conn.Close();
             }
+
            return null;
         }
 
@@ -109,6 +112,7 @@ namespace DBSync
             try
             {
                 conn.Open();
+                
                 Console.WriteLine("PG Connected");
             }
 
@@ -118,18 +122,60 @@ namespace DBSync
 
             }
             
+            //
+            try
+            {
 
 
-            // NpgsqlCommand command = new NpgsqlCommand("SELECT city, state FROM cities", conn);
-            string commandText = @"SELECT id, guid, username, userblob FROM ""USERS"" ";
-          
+                string tablesListRequestSQL =
+                    @"SELECT table_name FROM information_schema.tables WHERE table_schema='public'";
+                NpgsqlCommand commandGetDBTables = new NpgsqlCommand(tablesListRequestSQL, conn);
+                NpgsqlDataReader drGetDBTables = commandGetDBTables.ExecuteReader();
 
-            NpgsqlCommand command = new NpgsqlCommand(commandText, conn);
+                while (drGetDBTables.Read())
+                {
+                    existsInDBTables.Add(drGetDBTables[0].ToString());
+                }
+
+                foreach (string table in requireTablesList) // 
+                {
+                    if (!existsInDBTables.Contains(table))
+                        // if element from requireTablesList do not found -> DB have not simmilar Tables!
+                    {
+                        notFoundedTables.Add(table);
+                    }
+
+                }
+
+                if (notFoundedTables.Count != 0) // if not empty
+                {
+                    Console.WriteLine("Next tables are marked as reqired for Sync, but can't be found in DataBase: ");
+
+                    foreach (var table in notFoundedTables)
+                    {
+                        Console.WriteLine(table);
+                    }
+                }
+            }
+
+            catch (SocketException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            
+            
+
+           
+            Console.ReadKey();
+
+            string SQLrequest = @"SELECT id, guid, username, userblob FROM ""USERS""";
+             NpgsqlCommand command = new NpgsqlCommand(SQLrequest, conn);
+
 
             try
             {
                
-                NpgsqlDataReader dr = command.ExecuteReader();
+                NpgsqlDataReader dr = command.ExecuteReader(); // here
                 while (dr.Read())
                 {
                    // UserData ud = new UserData();

@@ -22,6 +22,7 @@ namespace DBSync
             fb.insertTestData();
 
             Postgres pg = new Postgres(config);
+            pg.ListDBTablesForProcessing();
             pg.PGConnect();
 
             SQLLite sqllite = new SQLLite(config);
