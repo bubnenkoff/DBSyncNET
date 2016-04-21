@@ -136,6 +136,7 @@ namespace DBSync
                 {
                     existsInDBTables.Add(drGetDBTables[0].ToString());
                 }
+                drGetDBTables.Dispose(); // complete request 
 
                 foreach (string table in requireTablesList) // 
                 {
@@ -156,6 +157,11 @@ namespace DBSync
                         Console.WriteLine(table);
                     }
                 }
+
+                else
+                {
+                    Console.WriteLine("All Tables that require Sync is exists in both DBs");
+                }
             }
 
             catch (SocketException e)
@@ -163,10 +169,7 @@ namespace DBSync
                 Console.WriteLine(e.Message);
             }
             
-            
-
            
-            Console.ReadKey();
 
             string SQLrequest = @"SELECT id, guid, username, userblob FROM ""USERS""";
              NpgsqlCommand command = new NpgsqlCommand(SQLrequest, conn);
@@ -186,8 +189,8 @@ namespace DBSync
                     uds.Add(ud);
                     //File.WriteAllBytes("outputimg.jpg", ud.userblob);
                     //Console.ReadKey();
-
                 }
+                dr.Dispose(); // releases conenction
 
             }
 
