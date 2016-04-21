@@ -21,12 +21,14 @@ namespace DBSync
           //  fb.dbDoSelect();
             fb.insertTestData();
 
-            Postgres pg = new Postgres(config);
+            SQLLite sqllite = new SQLLite(config);
+            sqllite.liteConnect();
+
+            Postgres pg = new Postgres(config, sqllite); // we should have acces to sqlite instance
             pg.ListDBTablesForProcessing();
             pg.PGConnect();
 
-            SQLLite sqllite = new SQLLite(config);
-            sqllite.liteConnect();
+
 
 
             Console.ReadKey();

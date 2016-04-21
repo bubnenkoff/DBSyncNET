@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DBSync.DB;
 using System.Net.Sockets;
 //using System.Data;
 
@@ -14,13 +15,17 @@ namespace DBSync
     class Postgres
     {
         Config config;
-       public Postgres(Config config)
+        SQLLite sqllite;
+        public Postgres(Config config, SQLLite sqllite)
        {
            this.config = config;
+           this.sqllite = sqllite;
+
        }
 
-       List<string> requireTablesList = new List<string>(); // LIST Of Tables in DB for processing
+        List<string> requireTablesList = new List<string>(); // LIST Of Tables in DB for processing
         List<string> existsInDBTables = new List<string>(); // this is getting from DB
+        List<string> foundedTables = new List<string>(); // Tables that we will sync
         List<string> notFoundedTables = new List<string>(); // Not founded Tables!
 
         struct UserData
@@ -35,7 +40,7 @@ namespace DBSync
        public List<string> ListDBTablesForProcessing() // List of TABLES in DB
         {
             
-            requireTablesList.AddRange(new List<string>() {"USERS"});
+            requireTablesList.AddRange(new List<string>() {"USERS", "sdf"});
             return requireTablesList;
         }
 
@@ -113,7 +118,7 @@ namespace DBSync
             {
                 conn.Open();
                 
-                Console.WriteLine("PG Connected");
+                Console.WriteLine("[STATUS] PG Connected");
             }
 
             catch(SocketException e)
@@ -141,26 +146,35 @@ namespace DBSync
                 foreach (string table in requireTablesList) // 
                 {
                     if (!existsInDBTables.Contains(table))
-                        // if element from requireTablesList do not found -> DB have not simmilar Tables!
+                        // if element from requireTablesList do not found -> DB have not similar Tables!
                     {
                         notFoundedTables.Add(table);
+                    }
+
+                    else
+                    {
+                        foundedTables.Add(table); // this Tables we will sync
                     }
 
                 }
 
                 if (notFoundedTables.Count != 0) // if not empty
                 {
-                    Console.WriteLine("Next tables are marked as reqired for Sync, but can't be found in DataBase: ");
+                    Console.WriteLine("[WARNING] Next tables are marked as reqired for Sync, but can't be found in DataBase: ");
 
                     foreach (var table in notFoundedTables)
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine(table);
+                        Console.ResetColor();
+                        
                     }
+              
                 }
 
                 else
                 {
-                    Console.WriteLine("All Tables that require Sync is exists in both DBs");
+                    Console.WriteLine("[OK] All Tables that require Sync is exists in both DBs");
                 }
             }
 
@@ -169,11 +183,8 @@ namespace DBSync
                 Console.WriteLine(e.Message);
             }
             
-           
-
             string SQLrequest = @"SELECT id, guid, username, userblob FROM ""USERS""";
-             NpgsqlCommand command = new NpgsqlCommand(SQLrequest, conn);
-
+            NpgsqlCommand command = new NpgsqlCommand(SQLrequest, conn);
 
             try
             {
@@ -203,6 +214,10 @@ namespace DBSync
             {
                 conn.Close();
             }
+
+
+            sqllite.liteCheckTablesExists(foundedTables);
+           
 
 
         }
