@@ -82,7 +82,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
-    <Compile Include="DB\SQLLite.cs" />
+    <Compile Include="DB\Contract\IDBRepository.cs" />
+    <Compile Include="Model\UserDataStruct.cs" />
+    <Compile Include="DB\SQLite.cs" />
     <Compile Include="DB\FireBird.cs" />
     <Compile Include="DB\Postgres.cs" />
     <Compile Include="Program.cs" />

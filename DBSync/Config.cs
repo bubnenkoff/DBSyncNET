@@ -54,8 +54,8 @@ namespace DBSync
 
             if (!File.Exists(SQLLitePath))
             {
-                Console.WriteLine("Wrong Path to SQLLite DataBase");
-               // throw new Exception("Wrong Path to SQLLite DataBase");
+                Console.WriteLine("Wrong Path to SQLite DataBase");
+               // throw new Exception("Wrong Path to SQLite DataBase");
             }
 
         }

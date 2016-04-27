@@ -6,8 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DBSync.DB;
 using System.Net.Sockets;
-//using System.Data;
-
+using DBSync.Model;
 using Npgsql;
 
 namespace DBSync
@@ -15,8 +14,8 @@ namespace DBSync
     class Postgres
     {
         Config config;
-        SQLLite sqllite;
-        public Postgres(Config config, SQLLite sqllite)
+        SQLite sqllite;
+        public Postgres(Config config, SQLite sqllite)
        {
            this.config = config;
            this.sqllite = sqllite;
@@ -28,13 +27,7 @@ namespace DBSync
         List<string> foundedTables = new List<string>(); // Tables that we will sync
         List<string> notFoundedTables = new List<string>(); // Not founded Tables!
 
-        struct UserData
-        {
-            public int id;
-            public string guid;
-            public string name;
-            public byte[] userblob;
-        };
+
 
 
        public List<string> ListDBTablesForProcessing() // List of TABLES in DB
@@ -131,7 +124,6 @@ namespace DBSync
             try
             {
 
-
                 string tablesListRequestSQL =
                     @"SELECT table_name FROM information_schema.tables WHERE table_schema='public'";
                 NpgsqlCommand commandGetDBTables = new NpgsqlCommand(tablesListRequestSQL, conn);
@@ -183,6 +175,7 @@ namespace DBSync
                 Console.WriteLine(e.Message);
             }
             
+            // really needed??
             string SQLrequest = @"SELECT id, guid, username, userblob FROM ""USERS""";
             NpgsqlCommand command = new NpgsqlCommand(SQLrequest, conn);
 
@@ -193,11 +186,14 @@ namespace DBSync
                 while (dr.Read())
                 {
                     // UserData ud = new UserData();
-                    ud.id = Int32.Parse(dr[0].ToString());
-                    ud.guid = (dr[1].ToString());
-                    ud.name = (dr[2].ToString());
-                    ud.userblob = (byte[]) dr[3];
-                    uds.Add(ud);
+
+                    ud.Id = dr[0].ToString();
+                    ud.Guid = (dr[1].ToString());
+                    ud.Name = (dr[2].ToString());
+                    ud.UserBlob = (byte[])dr[3];
+
+
+                   // uds.Add(ud);
                     //File.WriteAllBytes("outputimg.jpg", ud.userblob);
                     //Console.ReadKey();
                 }
@@ -207,6 +203,61 @@ namespace DBSync
 
             catch (Exception e)
             {
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine("Here");
+            }
+
+            finally
+            {
+                conn.Close();
+            }
+
+            sqllite.liteCheckTablesExists(foundedTables);
+
+        }
+
+
+        public void selectDataForSync() //data from PG that whould be insert in SQLLITE
+        {
+
+            UserData ud;
+            List<UserData> uds = new List<UserData>();
+
+            NpgsqlConnection conn =
+                 new NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=" + config.PGLogin + ";" +
+                                      "Password=" + config.PGPass + ";Database=" + config.PGdbName + ";");
+
+            conn.Open();
+
+            string SQLrequest = @"SELECT id, guid, username, userblob FROM ""USERS"" WHERE ""FL""=10;";
+            
+            Console.WriteLine(SQLrequest);
+            NpgsqlCommand command = new NpgsqlCommand(SQLrequest, conn);
+
+            try
+            {
+                NpgsqlDataReader dr = command.ExecuteReader(); // here exception
+                while (dr.Read())
+                {
+                    // UserData ud = new UserData();
+                    ud.Id = dr[0].ToString();
+                    ud.Guid = (dr[1].ToString());
+                    ud.Name = (dr[2].ToString());
+                    ud.UserBlob = (byte[])dr[3];
+
+                  //  uds.Add(ud);
+                    //File.WriteAllBytes("outputimg.jpg", ud.userblob);
+                    //Console.ReadKey();
+                    
+                    sqllite.insertDataFromPGToSQLLite(ud);
+                }
+                dr.Dispose(); // releases conenction
+
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine("SelectDataForSync function");
                 Console.WriteLine(e.Message);
             }
 
@@ -215,12 +266,9 @@ namespace DBSync
                 conn.Close();
             }
 
-
-            sqllite.liteCheckTablesExists(foundedTables);
-           
-
-
         }
+
+
 
 
     }
