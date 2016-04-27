@@ -102,7 +102,7 @@ namespace DBSync
         {
             try
             {
-                string sql = @"SELECT table_name FROM information_schema.tables WHERE table_schema='public'";
+                string sql = @"SELECT id, guid, username, userblob FROM ""USERS""";
 
                 NpgsqlCommand command = new NpgsqlCommand(sql, (NpgsqlConnection)Connection);
 
