@@ -46,7 +46,7 @@ namespace DBSync
         {
             // Тут подключаемся не стандартно -- без указания целевой БД, поэтому нельзя использовать метод Connect 
             NpgsqlConnection conn =
-                new NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=" + config.PGLogin + ";" +
+                new NpgsqlConnection("Server=127.0.0.1;Port=5433;User Id=" + config.PGLogin + ";" +
                                      "Password=" + config.PGPass + ";");
 
             conn.Open();
