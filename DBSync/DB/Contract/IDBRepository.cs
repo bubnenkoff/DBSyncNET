@@ -10,7 +10,8 @@ namespace DBSync.DB.Contract
         void Connect();
         void CloseConnect();
         UserData GetData();
-        void InsertData();
+        void InsertData(UserData ud);
+        void GetListExistsTables();
 
     }
 }

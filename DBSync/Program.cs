@@ -8,6 +8,7 @@ using FirebirdSql.Data.FirebirdClient;
 using System.Data.SQLite;
 using DBSync.DB;
 using DBSync.DB.Contract;
+using DBSync.Model;
 
 namespace DBSync
 {
@@ -15,24 +16,29 @@ namespace DBSync
     {
         public static void Main(string[] args)
         {
-            IDBRepository repositoryOne;
-            IDBRepository repositoryTwo;
+//            IDBRepository repositoryOne;
+//            IDBRepository repositoryTwo;
+
+
+           // repositoryOne.Connection;
 
             Config config = new Config();
             config.parseConfig();
 
-            FireBird fb = new FireBird(config);
-        //  fb.dbDoSelect();
-            fb.insertTestData();
+            //FireBird fb = new FireBird(config);
 
             SQLite sqllite = new SQLite(config);
-            sqllite.liteConnect();
+            sqllite.Connect();
             
 
             Postgres pg = new Postgres(config, sqllite); // we should have access to sqlite instance
+            pg.CheckIfPGDBFromConfigExists();
+            pg.ListDBTablesForProcessing(); // список таблиц для обработки. Им заполняется List в поле класса.
+            pg.GetListExistsTables();
+
             pg.ListDBTablesForProcessing();
-            pg.PGConnect();
-            pg.selectDataForSync();
+            pg.Connect();
+            pg.GetData();
 
 
             Console.ReadKey();

@@ -1,11 +1,15 @@
-﻿namespace DBSync.Model
+﻿using DBSync.DB.Contract;
+
+namespace DBSync.Model
 
 {
-   public  struct UserData
+   public  class UserData
     {
-        public string Id;
-        public string Guid;
-        public string Name;
-        public byte[] UserBlob;
+        public string Id { get; set; }
+        public string Guid { get; set; }
+        public string Name { get; set; }
+        public byte[] UserBlob { get; set; }
+
+     
     };
 }
