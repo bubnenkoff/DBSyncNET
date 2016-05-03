@@ -78,7 +78,7 @@ namespace DBSync
    
         public void Connect()
         {
-            Connection = new NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=" + config.PGLogin + ";" +
+            Connection = new NpgsqlConnection("Server=127.0.0.1;Port=5433;User Id=" + config.PGLogin + ";" +
                "Password=" + config.PGPass + ";Database=" + config.PGdbName + ";");
             try
             {

@@ -1,10 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using System.Data.SQLite;
+using System.Linq;
 using DBSync.DB.Contract;
 using DBSync.Model;
 
@@ -62,42 +62,42 @@ namespace DBSync.DB
 
         }
 
-//        public void liteCheckTablesExists(List<string> foundedInPGTables) // sqllite may do not have tables. Existen tables from PG
-//        {
-//            List<string> existInSQLLiteTables = new List<string>();
-//            List<string> existInSQLLiteAndPGTables = new List<string>();
-//
-//            foreach (var table in foundedInPGTables)
-//            {
-//
-//                // for each tables for Sync getting it's structure
-//                SQLiteCommand command = new SQLiteCommand((SQLiteConnection)Connection);
-//                command.CommandText = "SELECT name FROM sqlite_master where type='table'";
-//                command.Prepare();
-//
-//
-//                // check if every table in PG exists in SQLite
-//                SQLiteDataReader rdr = command.ExecuteReader();
-//
-//                while (rdr.Read())
-//                {
-//                    existInSQLLiteTables.Add(rdr[0].ToString());
-//                }
-//
-//                existInSQLLiteAndPGTables = existInSQLLiteTables.Intersect(foundedInPGTables).ToList();
-//
-//                Console.WriteLine("Next tables exists in SQLite and PostgreSQL and will be sync:");
-//                foreach (var t in existInSQLLiteTables)
-//                {
-//                    Console.ForegroundColor = ConsoleColor.Green;
-//                    Console.WriteLine(t);
-//                    Console.ResetColor();
-//
-//                }
-//
-//
-//            }
-//        }
+        public void liteCheckTablesExists(List<string> foundedInPGTables) // sqllite may do not have tables. Existen tables from PG
+        {
+            List<string> existInSQLLiteTables = new List<string>();
+            List<string> existInSQLLiteAndPGTables = new List<string>();
+
+            foreach (var table in foundedInPGTables)
+            {
+
+                // for each tables for Sync getting it's structure
+                SQLiteCommand command = new SQLiteCommand((SQLiteConnection)Connection);
+                command.CommandText = "SELECT name FROM sqlite_master where type='table'";
+                command.Prepare();
+
+
+                // check if every table in PG exists in SQLite
+                SQLiteDataReader rdr = command.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    existInSQLLiteTables.Add(rdr[0].ToString());
+                }
+
+                existInSQLLiteAndPGTables = existInSQLLiteTables.Intersect(foundedInPGTables).ToList();
+
+                Console.WriteLine("Next tables exists in SQLite and PostgreSQL and will be sync:");
+                foreach (var t in existInSQLLiteTables)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(t);
+                    Console.ResetColor();
+
+                }
+
+
+            }
+        }
 
 
         public void CloseConnect()
