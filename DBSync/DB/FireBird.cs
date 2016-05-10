@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Data.Common;
+using System.Data.SQLite;
+using DBSync.DB;
 using DBSync.DB.Contract;
 using DBSync.Model;
 using FirebirdSql.Data.FirebirdClient;
@@ -14,7 +17,7 @@ namespace DBSync
 
         private FbDataReader Reader { get; set; }
 
-        public FireBird(Config config)
+        public FireBird(Config config, SQLite sqllite)
         {
             ConnectionString =
                 "User=" + config.fbLogin + ";" +
@@ -33,27 +36,10 @@ namespace DBSync
                 "ServerType=0";
         }
 
+        private UserData ud = new UserData();
 
-        public static string testimg = "D:/Project/2016/DBSync/test.png";
-        public static string outputimg = "D:/Project/2016/DBSync/output.png";
+        List<string> TablesForSyncFromFB = new List<string>(new string[]{"USERS"});
 
-        
-
-        public static byte[] readByteImage(string photoFilePath)
-        {
-            FileStream stream = new FileStream(
-                photoFilePath, FileMode.Open, FileAccess.Read);
-            BinaryReader reader = new BinaryReader(stream);
-
-            byte[] photo = reader.ReadBytes((int) stream.Length);
-
-            File.WriteAllBytes(outputimg, photo);
-
-
-            reader.Close();
-            stream.Close();
-            return photo;
-        }
 
 
         public DbConnection Connection { get; set; }
@@ -63,13 +49,14 @@ namespace DBSync
             Connection = new FbConnection(ConnectionString);
             try
             {
-                Console.WriteLine("Open connections.");
+                Console.WriteLine("Open connections with FireBird");
                 Connection.Open();
             }
 
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                Console.WriteLine("Сan't connect to FireBird");
             }
         }
 
@@ -78,11 +65,32 @@ namespace DBSync
             Connection.Close();
         }
 
+     //  SQLite sqllite = new SQLite();
+        
+//        public void GetDataFromSQLite()
+//        {
+//            SQLiteCommand command = new SQLiteCommand((SQLiteConnection)Connection);
+//            command.CommandText = "SELECT id, userblob FROM USERS WHERE ID=1";
+//            command.Prepare();
+//
+//            // check if every table in PG exists in SQLite
+//            SQLiteDataReader rd = command.ExecuteReader();
+//
+//            while (rd.Read())
+//            {
+//                ud.Id = rd[0].ToString();
+//                ud.Guid = (rd[1].ToString());
+//                ud.Name = (rd[2].ToString());
+//                ud.UserBlob = (byte[])rd[3];
+//                
+//                InsertData(ud); // insert data from sql lite to 
+//            }
+//
+//        }
+
         public UserData GetData()
         {
 
-          var ud = new UserData(); 
-          //  FbDataReader reader;
             try
             {
 
@@ -101,7 +109,7 @@ namespace DBSync
 
                 while (Reader.Read())
                 {
-                    ud.Id = Reader[0].ToString(); // берем хотя бы один
+                  //  ud.Id = Reader[0].ToString(); // берем хотя бы один
                 }
                 
                 Reader.Close();
@@ -135,7 +143,7 @@ namespace DBSync
                     Connection = (FbConnection) Connection,
                     Transaction = myTransaction
                 };
-                myCommand.Parameters.Add("@userblob", readByteImage(testimg));
+            //    myCommand.Parameters.Add("@userblob", readByteImage(testimg));
                 // myCommand.Parameters.Add("@userblob", FbDbType.Binary).Value =  GetPhoto("D:/Project/2016/DBSync/test.png");
                 myCommand.ExecuteNonQuery();
 

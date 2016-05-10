@@ -25,10 +25,16 @@ namespace DBSync
             Config config = new Config();
             config.parseConfig();
 
-            //FireBird fb = new FireBird(config);
-
             SQLite sqllite = new SQLite(config);
+
+            FireBird fb = new FireBird(config, sqllite);
+            fb.Connect();
+
+            
+            
+            /*
             sqllite.Connect();
+
             
 
             Postgres pg = new Postgres(config, sqllite); // we should have access to sqlite instance
@@ -39,7 +45,7 @@ namespace DBSync
             pg.ListDBTablesForProcessing();
             pg.Connect();
             pg.GetData();
-
+            */
 
             Console.ReadKey();
             Console.ReadKey();

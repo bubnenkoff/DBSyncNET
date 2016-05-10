@@ -41,6 +41,8 @@ namespace DBSync.DB
                 }
 
             }
+
+
             Connection = new SQLiteConnection("Data Source=" + config.SQLLitePath + ";Version=3;");
             Connection.Open();
 
@@ -107,8 +109,27 @@ namespace DBSync.DB
 
         public UserData GetData()
         {
-            throw new NotImplementedException();
+            SQLiteCommand command = new SQLiteCommand((SQLiteConnection)Connection);
+            command.CommandText = "SELECT id, userblob FROM USERS WHERE ID=1";
+            command.Prepare();
+
+            // check if every table in PG exists in SQLite
+            SQLiteDataReader rd = command.ExecuteReader();
+
+            while (rd.Read())
+            {
+                ud.Id = rd[0].ToString();
+                ud.Guid = (rd[1].ToString());
+                ud.Name = (rd[2].ToString());
+                ud.UserBlob = (byte[])rd[3];
+
+                InsertData(ud); // insert data from sql lite to 
+            }
+
+            return ud;
         }
+
+
 
         public void InsertData(UserData ud)
         {
