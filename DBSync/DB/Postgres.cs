@@ -36,7 +36,6 @@ namespace DBSync
 
        public List<string> ListDBTablesForProcessing() // List of TABLES in DB
         {
-            
             requireTablesList.AddRange(new List<string>() {"USERS", "sdf"});
             return requireTablesList;
         }
@@ -46,7 +45,7 @@ namespace DBSync
         {
             // Тут подключаемся не стандартно -- без указания целевой БД, поэтому нельзя использовать метод Connect 
             NpgsqlConnection conn =
-                new NpgsqlConnection("Server=127.0.0.1;Port=5433;User Id=" + config.PGLogin + ";" +
+                new NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=" + config.PGLogin + ";" +
                                      "Password=" + config.PGPass + ";");
 
             conn.Open();
@@ -78,7 +77,7 @@ namespace DBSync
    
         public void Connect()
         {
-            Connection = new NpgsqlConnection("Server=127.0.0.1;Port=5433;User Id=" + config.PGLogin + ";" +
+            Connection = new NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=" + config.PGLogin + ";" +
                "Password=" + config.PGPass + ";Database=" + config.PGdbName + ";");
             try
             {
@@ -102,11 +101,18 @@ namespace DBSync
         {
             try
             {
-                string sql = @"SELECT id, guid, username, userblob FROM ""USERS""";
+                string sql = @"SELECT id, guid, username, userblob, ""FL"" FROM ""USERS"" WHERE ""FL""=10;";
 
                 NpgsqlCommand command = new NpgsqlCommand(sql, (NpgsqlConnection)Connection);
 
                 NpgsqlDataReader dr = command.ExecuteReader(); // here exception
+                if (!dr.HasRows)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("[INFO] PostgreSQL do not have data with FL=10");
+                    Console.ResetColor();
+                }
+                int i = 0;
                 while (dr.Read())
                 {
                     // UserData ud = new UserData();
@@ -114,14 +120,37 @@ namespace DBSync
                     ud.Guid = (dr[1].ToString());
                     ud.Name = (dr[2].ToString());
                     ud.UserBlob = (byte[])dr[3];
-
-                    //  uds.Add(ud);
-                    //File.WriteAllBytes("outputimg.jpg", ud.userblob);
-                    //Console.ReadKey();
-
-                    sqllite.InsertData(ud);
+                    ud.FL = dr[4].ToString();
+                    i++;
                 }
-                dr.Dispose(); // releases conenction
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("[INFO] Syncronisated PG->SQLite rows: {0}", i);
+                Console.ResetColor();
+                dr.Dispose(); // releases connection
+                try
+                {
+                    sqllite.Connect();
+                    sqllite.InsertData(ud);
+                    string sqlUpdate = @"UPDATE ""USERS"" SET ""FL""=11 WHERE ""FL""=10;";
+                    //NpgsqlCommand commandUpdate = new NpgsqlCommand(sql, (NpgsqlConnection)Connection);
+                    NpgsqlCommand cmd = new NpgsqlCommand(sqlUpdate, (NpgsqlConnection)Connection);
+                    cmd.ExecuteNonQuery();
+
+                    if (i > 0)
+                    {
+                        Console.WriteLine("Flags in PostgreSQL set to 11 (waiting for sync)");
+                    }
+                        
+                    sqllite.CloseConnect();
+                    Console.ReadKey();
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine("Can't insert data to SQLite");
+                }
+                
 
             }
 
@@ -133,6 +162,9 @@ namespace DBSync
 
             return ud;
         }
+
+
+  
 
         public void InsertData(UserData ud)
         {

@@ -27,16 +27,6 @@ namespace DBSync
 
             SQLite sqllite = new SQLite(config);
 
-            FireBird fb = new FireBird(config, sqllite);
-            fb.Connect();
-
-            
-            
-            /*
-            sqllite.Connect();
-
-            
-
             Postgres pg = new Postgres(config, sqllite); // we should have access to sqlite instance
             pg.CheckIfPGDBFromConfigExists();
             pg.ListDBTablesForProcessing(); // список таблиц для обработки. Им заполняется List в поле класса.
@@ -44,8 +34,20 @@ namespace DBSync
 
             pg.ListDBTablesForProcessing();
             pg.Connect();
-            pg.GetData();
-            */
+            pg.GetData(); // here we will call sqllite.InsertData(ud); and insert data to SQLite
+
+
+
+
+//            FireBird fb = new FireBird(config, sqllite);
+//            fb.Connect();
+//            fb.GetGUIDsFromFB();
+//            fb.IntersectPGandSQLite();
+//
+//            sqllite.Connect();
+
+ 
+            
 
             Console.ReadKey();
             Console.ReadKey();

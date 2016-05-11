@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Data.Common;
 using System.Data.SQLite;
+using System.Linq;
 using DBSync.DB;
 using DBSync.DB.Contract;
 using DBSync.Model;
@@ -16,6 +17,9 @@ namespace DBSync
         private string ConnectionString { get; set; }
 
         private FbDataReader Reader { get; set; }
+
+        Config config;
+        SQLite sqllite;
 
         public FireBird(Config config, SQLite sqllite)
         {
@@ -34,22 +38,27 @@ namespace DBSync
                 "MaxPoolSize=50;" +
                 "Packet Size=8192;" +
                 "ServerType=0";
+
+            this.config = config;
+            this.sqllite = sqllite;
         }
 
+ 
         private UserData ud = new UserData();
 
         List<string> TablesForSyncFromFB = new List<string>(new string[]{"USERS"});
 
 
-
         public DbConnection Connection { get; set; }
+
+       
 
         public void Connect()
         {
             Connection = new FbConnection(ConnectionString);
             try
             {
-                Console.WriteLine("Open connections with FireBird");
+               // Console.WriteLine("Open connections with FireBird");
                 Connection.Open();
             }
 
@@ -88,12 +97,54 @@ namespace DBSync
 //
 //        }
 
+        // Нужно взять все ГУИДы из FB и потом пересечь их
+        public List<string> GetGUIDsFromFB()
+        {
+            
+            List<string> FBguids = new List<string>();
+            Connect();
+            FbTransaction myTransaction = (FbTransaction)Connection.BeginTransaction();
+            FbCommand myCommand = new FbCommand
+            {
+                Connection = (FbConnection)Connection,
+                Transaction = myTransaction,
+                CommandText = @"SELECT guid, id FROM ""USERS"";"
+            };
+            myCommand.Connection = (FbConnection)Connection;
+            myCommand.Transaction = myTransaction;
+
+            Reader = myCommand.ExecuteReader();
+
+            while (Reader.Read())
+            {
+                FBguids.Add(Reader[0].ToString());
+                Console.WriteLine(Reader[0].ToString());
+              
+            }
+
+            Reader.Close();
+            CloseConnect();
+
+            return FBguids;
+        }
+
+        List<string> DataExistInSQLiteButNotInFB = new List<string>();
+
+        public void IntersectPGandSQLite()
+        {
+            //sqllite.GetGUIDsFromSQLite();
+            Console.WriteLine("---------");
+            DataExistInSQLiteButNotInFB = sqllite.GetGUIDsFromSQLite().Intersect(GetGUIDsFromFB()).ToList();
+            Console.WriteLine(string.Join(", ", DataExistInSQLiteButNotInFB));
+            Console.WriteLine("^^^^^^^^^^");
+
+        }
+        
         public UserData GetData()
         {
 
             try
             {
-
                 FbTransaction myTransaction = (FbTransaction) Connection.BeginTransaction();
                 FbCommand myCommand = new FbCommand
                 {
@@ -124,9 +175,9 @@ namespace DBSync
             finally
             {
                 Reader.Close();
-                Connection.Close();
+               
             }
-
+            Connection.Close();
             return ud;
         }
 

@@ -48,10 +48,10 @@ namespace DBSync.DB
 
             try
             {
-                string sql = "create table if not exists USERS (id int, guid varchar(36), username varchar(20), userblob blob)";
+                string sql = "create table if not exists USERS (id int, guid varchar(36), username varchar(20), userblob blob, FL int)";
                 SQLiteCommand command = new SQLiteCommand(sql, (SQLiteConnection)Connection);
                 command.ExecuteNonQuery();
-                Console.WriteLine("Table in SQLLITE created with next request:!");
+                Console.WriteLine("Table in SQLLITE created with next request:");
                 Console.WriteLine("{0}", sql);
             }
 
@@ -155,6 +155,29 @@ namespace DBSync.DB
 
             }
         }
+
+
+        public List<string> GetGUIDsFromSQLite()
+        {
+            Connect();
+            List<string> liteguids = new List<string>();
+            SQLiteCommand command = new SQLiteCommand((SQLiteConnection)Connection);
+            command.CommandText = "SELECT name FROM sqlite_master where type='table'";
+            command.Prepare();
+
+            // check if every table in PG exists in SQLite
+            SQLiteDataReader rdr = command.ExecuteReader();
+       
+
+            while (rdr.Read())
+            {
+                liteguids.Add(rdr[0].ToString());
+                Console.WriteLine(rdr[0].GetType());
+            }
+
+            return liteguids;
+        }
+
 
         public void GetListExistsTables()
         {

@@ -9,6 +9,7 @@ namespace DBSync.Model
         public string Guid { get; set; }
         public string Name { get; set; }
         public byte[] UserBlob { get; set; }
+        public string FL { get; set; }
 
      
     };
