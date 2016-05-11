@@ -21,7 +21,7 @@ namespace DBSync.DB
 
         public DbConnection Connection { get; set; }
 
-        private UserData ud = new UserData();
+        private List<UserData> uds = new List<UserData>();
 
         public void Connect()
         {
@@ -107,7 +107,7 @@ namespace DBSync.DB
             Connection.Close();
         }
 
-        public UserData GetData()
+        public List<UserData> GetData()
         {
             SQLiteCommand command = new SQLiteCommand((SQLiteConnection)Connection);
             command.CommandText = "SELECT id, userblob FROM USERS WHERE ID=1";
@@ -118,20 +118,21 @@ namespace DBSync.DB
 
             while (rd.Read())
             {
+                UserData ud = new UserData(); //создаем один экземпляр
                 ud.Id = rd[0].ToString();
                 ud.Guid = (rd[1].ToString());
                 ud.Name = (rd[2].ToString());
                 ud.UserBlob = (byte[])rd[3];
-
+                uds.Add(ud);
                 InsertData(ud); // insert data from sql lite to 
             }
 
-            return ud;
+            return uds;
         }
 
 
 
-        public void InsertData(UserData ud)
+        public void InsertData(List<UserData> ud)
         {
             Connection = new SQLiteConnection("Data Source=" + config.SQLLitePath + ";Version=3;");
             Connection.Open();
@@ -139,6 +140,8 @@ namespace DBSync.DB
             SQLiteCommand insertSQL = new SQLiteCommand(@"INSERT INTO ""USERS"" (id, guid, username, userblob) VALUES (?,?,?,?)", (SQLiteConnection)Connection);
             try
             {
+                foreach (UserData ud in uds)
+                {
                 insertSQL.Parameters.Add(new SQLiteParameter { Value = ud.Id });
                 insertSQL.Parameters.Add(new SQLiteParameter { Value = ud.Guid });
                 insertSQL.Parameters.Add(new SQLiteParameter { Value = ud.Name });
@@ -146,6 +149,8 @@ namespace DBSync.DB
 
                 insertSQL.ExecuteNonQuery();
                 Console.WriteLine("Data Inserted in SQLLite");
+                }
+
             }
 
             catch (Exception e)

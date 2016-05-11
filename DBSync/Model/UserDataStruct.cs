@@ -3,9 +3,9 @@
 namespace DBSync.Model
 
 {
-   public  class UserData
+   public struct UserData
     {
-        public string Id { get; set; }
+        public string Id;
         public string Guid { get; set; }
         public string Name { get; set; }
         public byte[] UserBlob { get; set; }

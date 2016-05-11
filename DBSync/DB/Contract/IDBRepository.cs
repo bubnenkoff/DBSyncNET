@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System.Collections.Generic;
+using System.Data.Common;
 using DBSync.Model;
 
 namespace DBSync.DB.Contract
@@ -9,8 +10,8 @@ namespace DBSync.DB.Contract
         
         void Connect();
         void CloseConnect();
-        UserData GetData();
-        void InsertData(UserData ud);
+        List<UserData> GetData();
+        void InsertData(List<UserData> ud);
         void GetListExistsTables();
 
     }

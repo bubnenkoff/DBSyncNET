@@ -44,7 +44,9 @@ namespace DBSync
         }
 
  
-        private UserData ud = new UserData();
+        //rivate UserData ud = new UserData();
+
+        private List<UserData> ud = new List<UserData>();
 
         List<string> TablesForSyncFromFB = new List<string>(new string[]{"USERS"});
 
@@ -140,7 +142,7 @@ namespace DBSync
 
         }
         
-        public UserData GetData()
+        public List<UserData> GetData()
         {
 
             try
@@ -182,7 +184,7 @@ namespace DBSync
         }
 
 
-        public void InsertData(UserData ud)
+        public void InsertData(List<UserData> ud)
         {
             try
             {

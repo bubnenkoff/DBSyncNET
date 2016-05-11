@@ -23,7 +23,7 @@ namespace DBSync
            this.sqllite = sqllite;
        }
 
-        private UserData ud = new UserData();
+        private List<UserData> uds = new List<UserData>();
 
         public DbConnection Connection { get; set; }
 
@@ -97,7 +97,7 @@ namespace DBSync
             Connection.Close();
         }
 
-        public UserData GetData()
+        public List<UserData> GetData()
         {
             try
             {
@@ -115,12 +115,13 @@ namespace DBSync
                 int i = 0;
                 while (dr.Read())
                 {
-                    // UserData ud = new UserData();
+                    UserData ud = new UserData();
                     ud.Id = dr[0].ToString();
                     ud.Guid = (dr[1].ToString());
                     ud.Name = (dr[2].ToString());
                     ud.UserBlob = (byte[])dr[3];
                     ud.FL = dr[4].ToString();
+                    uds.Add(ud);
                     i++;
                 }
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -130,7 +131,7 @@ namespace DBSync
                 try
                 {
                     sqllite.Connect();
-                    sqllite.InsertData(ud);
+                    sqllite.InsertData(uds);
                     string sqlUpdate = @"UPDATE ""USERS"" SET ""FL""=11 WHERE ""FL""=10;";
                     //NpgsqlCommand commandUpdate = new NpgsqlCommand(sql, (NpgsqlConnection)Connection);
                     NpgsqlCommand cmd = new NpgsqlCommand(sqlUpdate, (NpgsqlConnection)Connection);
@@ -160,13 +161,13 @@ namespace DBSync
                 Console.WriteLine(e.Message);
             }
 
-            return ud;
+            return uds;
         }
 
 
   
 
-        public void InsertData(UserData ud)
+        public void InsertData(List<UserData> ud)
         {
             throw new NotImplementedException();
         }
