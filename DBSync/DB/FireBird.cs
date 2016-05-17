@@ -121,7 +121,6 @@ namespace DBSync
             {
                 FBguids.Add(Reader[0].ToString());
                 Console.WriteLine(Reader[0].ToString());
-              
             }
 
             Reader.Close();
@@ -130,17 +129,66 @@ namespace DBSync
             return FBguids;
         }
 
-        List<string> DataExistInSQLiteButNotInFB = new List<string>();
+
 
         public void IntersectPGandSQLite()
         {
+            List<string> DataExistInSQLiteANDinFB = new List<string>();
+            List<string> DataExistInSQLiteButNOTINFB = new List<string>(); // из FireBird вычитаем общие с SQLite данные // ЭТИ ГУИДЫ И загружаем
+            
             //sqllite.GetGUIDsFromSQLite();
-            Console.WriteLine("---------");
-            DataExistInSQLiteButNotInFB = sqllite.GetGUIDsFromSQLite().Intersect(GetGUIDsFromFB()).ToList();
-            Console.WriteLine(string.Join(", ", DataExistInSQLiteButNotInFB));
+            Console.WriteLine("-----IntersectPGandSQLite-----");
+            DataExistInSQLiteANDinFB = sqllite.GetGUIDsFromSQLite().Intersect(GetGUIDsFromFB()).ToList();
+            DataExistInSQLiteButNOTINFB = GetGUIDsFromFB().Except(DataExistInSQLiteANDinFB).ToList();
+            Console.WriteLine("****************************************");
+                Console.WriteLine("FireBird and SQLite have common elements: {0} | GUIDs:", DataExistInSQLiteANDinFB.Count);
+                foreach (var el in DataExistInSQLiteANDinFB)
+                {
+                    Console.WriteLine(el);    
+                }
+            Console.WriteLine("****************************************");
+
+            Console.WriteLine("-----NEXT GUIDs Should be loaded FROM SQLite TO FireBird:-----");
+            foreach (var el in DataExistInSQLiteButNOTINFB)
+            {
+                Console.WriteLine(el);
+            }
+            Console.WriteLine("------------------------------------------");
+
             Console.WriteLine("^^^^^^^^^^");
 
+            sqllite.GetAllDataWithSelectedGUIDs(DataExistInSQLiteButNOTINFB);
         }
+
+
+        public void InsertNeededDataFromSQLite(List<UserData> ud) // Вставляем только те данные которые нам были нужны
+        {
+            try
+            {
+                Connect();
+                FbTransaction myTransaction = ((FbConnection)Connection).BeginTransaction();
+                FbCommand myCommand = new FbCommand
+                {
+                    CommandText = "UPDATE USERS SET USERBLOB = @userblob WHERE ID=1",
+                    Connection = (FbConnection)Connection,
+                    Transaction = myTransaction
+                };
+                //    myCommand.Parameters.Add("@userblob", readByteImage(testimg));
+                // myCommand.Parameters.Add("@userblob", FbDbType.Binary).Value =  GetPhoto("D:/Project/2016/DBSync/test.png");
+                myCommand.ExecuteNonQuery();
+
+                myTransaction.Commit();
+                myCommand.Dispose();
+                Connection.Close();
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+
         
         public List<UserData> GetData()
         {
@@ -210,6 +258,9 @@ namespace DBSync
                 Console.WriteLine(e.Message);
             }
         }
+
+
+
 
         public void GetListExistsTables()
         {

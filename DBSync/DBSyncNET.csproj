@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="DB\Common.cs" />
     <Compile Include="DB\Contract\IDBRepository.cs" />
     <Compile Include="Model\UserDataStruct.cs" />
     <Compile Include="DB\SQLite.cs" />

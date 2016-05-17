@@ -25,18 +25,20 @@ namespace DBSync
             Config config = new Config();
             config.parseConfig();
 
-            SQLite sqllite = new SQLite(config);
+            SQLite sqlite = new SQLite(config);
+            Postgres pg = new Postgres(config, sqlite);
+            FireBird fb = new FireBird(config, sqlite);
 
-            Postgres pg = new Postgres(config, sqllite); // we should have access to sqlite instance
-            pg.CheckIfPGDBFromConfigExists();
-            pg.ListDBTablesForProcessing(); // список таблиц для обработки. Им заполняется List в поле класса.
-            pg.GetListExistsTables();
+            CommonDB mydbs = new CommonDB(config, pg, fb);
 
-            pg.ListDBTablesForProcessing();
-            pg.Connect();
-            pg.GetData(); // here we will call sqllite.InsertData(ud); and insert data to SQLite
-
-
+//            Postgres pg = new Postgres(config, sqllite); // we should have access to sqlite instance
+//            pg.CheckIfPGDBFromConfigExists();
+//            pg.ListDBTablesForProcessing(); // список таблиц для обработки. Им заполняется List в поле класса.
+//            pg.GetListExistsTables();
+//
+//            pg.ListDBTablesForProcessing();
+//            pg.Connect();
+//            pg.GetData(); // here we will call sqllite.InsertData(ud); and insert data to SQLite
 
 
 //            FireBird fb = new FireBird(config, sqllite);

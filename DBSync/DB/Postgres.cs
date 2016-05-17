@@ -23,7 +23,7 @@ namespace DBSync
            this.sqllite = sqllite;
        }
 
-        private List<UserData> uds = new List<UserData>();
+        private List<UserData> PGuds = new List<UserData>();
 
         public DbConnection Connection { get; set; }
 
@@ -121,9 +121,13 @@ namespace DBSync
                     ud.Name = (dr[2].ToString());
                     ud.UserBlob = (byte[])dr[3];
                     ud.FL = dr[4].ToString();
-                    uds.Add(ud);
+                    PGuds.Add(ud);
                     i++;
+                    Console.WriteLine("Get PG data: {0}", i);
+
                 }
+                Console.WriteLine("Total PG rows: {0}", PGuds.Count);
+
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("[INFO] Syncronisated PG->SQLite rows: {0}", i);
                 Console.ResetColor();
@@ -131,7 +135,8 @@ namespace DBSync
                 try
                 {
                     sqllite.Connect();
-                    sqllite.InsertData(uds);
+                    Console.WriteLine("we are here");
+                    sqllite.InsertData(PGuds);
                     string sqlUpdate = @"UPDATE ""USERS"" SET ""FL""=11 WHERE ""FL""=10;";
                     //NpgsqlCommand commandUpdate = new NpgsqlCommand(sql, (NpgsqlConnection)Connection);
                     NpgsqlCommand cmd = new NpgsqlCommand(sqlUpdate, (NpgsqlConnection)Connection);
@@ -161,7 +166,7 @@ namespace DBSync
                 Console.WriteLine(e.Message);
             }
 
-            return uds;
+            return PGuds;
         }
 
 
